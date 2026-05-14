@@ -1,15 +1,10 @@
-"use client";
-
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { ProgressBar } from "@/components/ui/progress-bar";
-import type { LearningPath, UserProgress } from "@/types";
-import { getPathProgress } from "@/lib/progress";
+import type { LearningPath } from "@/types";
+import { PathProgressCard } from "@/components/path-progress-card";
 
-export function PathCard({ path, progress }: { path: LearningPath; progress: UserProgress }) {
-  const value = getPathProgress(path.id, progress);
-
+export function PathCard({ path }: { path: LearningPath }) {
   return (
     <Link href={`/paths/${path.id}`} className="group block">
       <Card className="flex h-full flex-col justify-between">
@@ -23,13 +18,7 @@ export function PathCard({ path, progress }: { path: LearningPath; progress: Use
           <h2 className="text-xl font-semibold tracking-tight text-chalk">{path.title}</h2>
           <p className="mt-3 min-h-20 text-sm leading-6 text-muted">{path.description}</p>
         </div>
-        <div className="mt-7">
-          <div className="mb-3 flex items-center justify-between text-sm">
-            <span className="text-muted">{path.lessonIds.length} lessons</span>
-            <span className="font-medium text-chalk">{value}%</span>
-          </div>
-          <ProgressBar value={value} />
-        </div>
+        <PathProgressCard pathId={path.id} lessonCount={path.lessonIds.length} />
       </Card>
     </Link>
   );

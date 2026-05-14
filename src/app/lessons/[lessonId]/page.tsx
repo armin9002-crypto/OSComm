@@ -1,23 +1,22 @@
-"use client";
-
 import Link from "next/link";
-import { notFound, useParams } from "next/navigation";
-import { CheckCircle2 } from "lucide-react";
+import { notFound } from "next/navigation";
 import { lessons, principles } from "@/data/seed";
-import { useProgress } from "@/lib/hooks";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
 import { CategoryPill } from "@/components/category-pill";
+import { MarkLessonComplete } from "@/components/mark-lesson-complete";
 
-export default function LessonDetailPage() {
-  const params = useParams<{ lessonId: string }>();
-  const { progress, markLessonComplete } = useProgress();
-  const lesson = lessons.find((item) => item.id === params.lessonId);
+export function generateStaticParams() {
+  return lessons.map((lesson) => ({ lessonId: lesson.id }));
+}
+
+export default async function LessonDetailPage({ params }: { params: Promise<{ lessonId: string }> }) {
+  const { lessonId } = await params;
+  const lesson = lessons.find((item) => item.id === lessonId);
 
   if (!lesson) notFound();
 
   const related = principles.filter((principle) => lesson.relatedPrincipleIds.includes(principle.id));
-  const complete = progress?.completedLessonIds.includes(lesson.id) ?? false;
 
   return (
     <>
@@ -53,14 +52,7 @@ export default function LessonDetailPage() {
             <p className="mt-3 text-sm leading-6 text-white/58">
               Marking this lesson complete awards {lesson.xp} XP and may unlock the next lesson in the path.
             </p>
-            <button
-              disabled={complete || !progress}
-              onClick={() => markLessonComplete(lesson.id, lesson.xp)}
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md bg-white px-4 py-3 text-sm font-semibold text-ink transition hover:bg-gold disabled:cursor-not-allowed disabled:bg-white/12 disabled:text-white/45"
-            >
-              <CheckCircle2 size={18} />
-              {complete ? "Lesson complete" : "Mark complete"}
-            </button>
+            <MarkLessonComplete lessonId={lesson.id} xp={lesson.xp} />
           </Card>
 
           <Card>

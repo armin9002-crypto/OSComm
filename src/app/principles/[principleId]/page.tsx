@@ -1,17 +1,20 @@
-"use client";
-
-import { notFound, useParams } from "next/navigation";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { lessons, principles } from "@/data/seed";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
 import { CategoryPill } from "@/components/category-pill";
 
-export default function PrincipleDetailPage() {
-  const params = useParams<{ principleId: string }>();
-  const principle = principles.find((item) => item.id === params.principleId);
+export function generateStaticParams() {
+  return principles.map((principle) => ({ principleId: principle.id }));
+}
+
+export default async function PrincipleDetailPage({ params }: { params: Promise<{ principleId: string }> }) {
+  const { principleId } = await params;
+  const principle = principles.find((item) => item.id === principleId);
 
   if (!principle) notFound();
+
   const relatedLessons = lessons.filter((lesson) => principle.relatedLessonIds.includes(lesson.id));
 
   return (
